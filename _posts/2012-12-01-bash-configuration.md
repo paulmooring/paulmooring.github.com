@@ -28,13 +28,13 @@ welcome
 
 All this does is load the system default bash configuration then load all the .sh files in `.bash.d/`.  The `welcome` command is defined inside another file explained later.  Because every file with a .sh extension gets loaded I explicitly source dependencies and the organization is purely for my benefit, it doesn't matter how many files the configuration is broken into or what they are named.  Some of the zsh features responsible for it's popularity are shared history, customizable prompts and context specific tab completion so I'll tak about those features.  In addition to the features I mentioned I also have the following files:
 
-* [aliases.sh](https://github.com/paulmooring/bashrc/blob/master/aliases.sh):			Contains aliases
-* [color_man.sh](https://github.com/paulmooring/bashrc/blob/master/color_man.sh):			Adds color to man pages
-* [env_variables.sh](https://github.com/paulmooring/bashrc/blob/master/env_variables.sh):		Set variables like EDITOR
-* secrets.sh:			Set variables like GITHUB_TOKEN (in `.gitignore`)
-* [functions.sh](https://github.com/paulmooring/bashrc/blob/master/functions.sh):			Extra interactive functions (password generator ect.)
-* [shell_settings.sh](https://github.com/paulmooring/bashrc/blob/master/shell_settings.sh.sh):	Sets `shopt` and `set -o` bash settings (like vi mode)
-* [rbenv.sh](https://github.com/paulmooring/bashrc/blob/master/rbenv.sh):				Sets up [rbenv](https://github.com/sstephenson/rbenv)
+* [aliases.sh](https://github.com/paulmooring/bashrc/blob/master/aliases.sh) - Contains aliases
+* [color_man.sh](https://github.com/paulmooring/bashrc/blob/master/color_man.sh) - Adds color to man pages
+* [env_variables.sh](https://github.com/paulmooring/bashrc/blob/master/env_variables.sh) - Set variables like EDITOR
+* secrets.sh - Set variables like GITHUB_TOKEN (in `.gitignore`)
+* [functions.sh](https://github.com/paulmooring/bashrc/blob/master/functions.sh) - Extra interactive functions (password generator ect.)
+* [shell_settings.sh](https://github.com/paulmooring/bashrc/blob/master/shell_settings.sh.sh) - Sets `shopt` and `set -o` bash settings (like vi mode)
+* [rbenv.sh](https://github.com/paulmooring/bashrc/blob/master/rbenv.sh) - Sets up [rbenv](https://github.com/sstephenson/rbenv)
 
 Now on to the zsh-like features!  Using bash-completion is pretty common and there's nothing special going on in this file:
 
@@ -150,20 +150,20 @@ PS1="${PS1}---\${fill}- \[${LIGHTBLUE}\]\$dir \[${NC}\]--\n"
 PS1="${PS1}-- \[${LIGHTCYAN}\]\u\[${NC}\]@\[${BROWN}\]\h \[${NC}\] \$ "
 
 export PS1
-{% endhighlighting %}
+{% endhighlight %}
 
 Alright so this is a little longer and requires more effort than a zsh prompt, but broken in too pieces it's not too bad.  PROMPT_COMMAND is a variable containing a command to run prior to rendering the PS1 prompt after every shell command that's run.  The high level overview of this script is it runs PROMPT command to build up some variables, then uses those in the PS1 prompt.  The beginning of the script just defines the escape sequences for displaying colors to variables with more friendly names:
 
-{% highlighting bash %}
+{% highlight bash %}
 BLACK='\033[0;30m'
 BLUE='\033[0;34m'
-{% endhighlighting %}
+{% endhighlight %}
 
 All this accomplishes is when creating the PS1 variable I can type `${BLUE}` instead of `\033[0;34m` which is more more readable.  Then a few functions are defined all for the purpose of setting the `$fill` and `$dir` variables.  Because the git branch, ruby version and current directory can be of any length it's neccesary to compute how many '-'s are needed to fill the first line.  The `git_prompt` and `ruby_prompt` functions are also created to be used in the prompt.  Finally the prompt itself is defined, using `\[\]` defines some non-printable characters if you don't do this than line wrapping won't work correctly.  There's also some special sequence when defining a prompt I'm using '\u' for user, '\h' for short hostname and '\$' which is '$' for any non-root user and '#' for root.  The only other strange notation is variable/sub-shell escaping.  When I call `git_prompt` normally a subshell is written `$(git_prompt)` the extra '\' lets the prompt know to re-run the command every time the prompt is rendered, without it the git branch or ruby version would be staticly set when the script first runs rather than updating as I change directories.
 
 The last script I'll discuss is `history.sh`:
 
-{% highlighting bash %}
+{% highlight bash %}
 export HISTSIZE=9000
 export HISTFILESIZE=$HISTSIZE
 export HISTCONTROL=ignorespace:ignoredups
@@ -181,7 +181,7 @@ _bash_history_sync() {
 }
 
 PROMPT_COMMAND="_bash_history_sync ; $PROMPT_COMMAND"
-{% endhighlighting %}
+{% endhighlight %}
 
 This script also uses PROMPT_COMMAND, both use the pattern of `PROMPT_COMMAND="new_stuff ; $PROMPT_COMMAND"` so that the order the scripts are parsed doesn't matter.  The comments explain what's happening here, every time `PROMPT_COMMAND` is run (which is after every command) the current bash history is written to the history file, the history is flushed and re-loaded from the file.  This way every terminal is reading it's history from the same location.
 
